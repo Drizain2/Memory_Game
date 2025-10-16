@@ -1,0 +1,26 @@
+.main {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10px;
+    grid-auto-rows: 1fr;   
+}
+.card{
+    background-color: #cbfbef;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: 30px;
+}
+.flipped{
+    background-color: #94bbf5;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: 30px;
+}
