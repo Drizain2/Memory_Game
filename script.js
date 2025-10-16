@@ -29,7 +29,10 @@ window.addEventListener('load', () => {
     let emojipairs = [...emojis, ...emojis];
     emojipairs = emojipairs.sort(() => Math.random() - 0.5);
 
-    const cartesElements = document.querySelectorAll('.card');
+    let cartesElements = document.querySelectorAll('.card');
+    const content = document.querySelector('.main');
+    cartesElements = shuffle(Array.from(cartesElements));
+    content.append(...cartesElements);
     let cards = [];
     let flippedCards = [];
     let lockBoard = false;
@@ -68,5 +71,12 @@ window.addEventListener('load', () => {
                 }, 1000);
             }
         }
+    }
+    function shuffle(array){
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array
     }
 });
