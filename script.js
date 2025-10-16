@@ -1,4 +1,14 @@
 window.addEventListener('load', () => {
+    let cartesElements = document.querySelectorAll('.card');
+    const content = document.querySelector('.main');
+    const resetBn = document.querySelector('.reset')
+    const timerElement = document.querySelector('.timer');
+    let cards = [];
+    let flippedCards = [];
+    let lockBoard = false;
+    let timer = 0;
+
+    cartesElements = shuffle(Array.from(cartesElements));
     class Card {
         static id = 0;
         constructor(image, element) {
@@ -29,13 +39,9 @@ window.addEventListener('load', () => {
     let emojipairs = [...emojis, ...emojis];
     emojipairs = emojipairs.sort(() => Math.random() - 0.5);
 
-    let cartesElements = document.querySelectorAll('.card');
-    const content = document.querySelector('.main');
-    cartesElements = shuffle(Array.from(cartesElements));
+
     content.append(...cartesElements);
-    let cards = [];
-    let flippedCards = [];
-    let lockBoard = false;
+
 
     cartesElements.forEach((element, i) => {
         const emojiIndex = element.dataset.card;
@@ -72,11 +78,26 @@ window.addEventListener('load', () => {
             }
         }
     }
-    function shuffle(array){
+    function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array
     }
+    resetBn.addEventListener('click', () => {
+        cards.forEach(card => {
+            card.found = false;
+            card.flip();
+            card.hide();
+        });
+    })
+
+    const timerInterval = setInterval(dure, 1000);
+
+    function dure() {
+        timer++;
+        timerElement.textContent = `Temps écouleur : ${Math.floor(timer / 60)} : ${timer % 60} s`;
+    }
 });
+
