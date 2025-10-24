@@ -1,38 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Game</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Jeu de Mémoire Animé</title>
 </head>
-
 <body>
-    <div class="container">
-
-        <div class="head">
-            <p>Choisissez deux cartes identiques</p>
-            <section class="timer">Temps écoulé : </section>
-        </div>
-        <div class="main">
-            <div class="card" data-card="1">cartes</div>
-            <div class="card" data-card="1">cartes</div>
-            <div class="card" data-card="2">cartes</div>
-            <div class="card" data-card="2">cartes</div>
-            <div class="card" data-card="3">cartes</div>
-            <div class="card" data-card="3">cartes</div>
-            <div class="card" data-card="4">cartes</div>
-            <div class="card" data-card="4">cartes</div>
-            <div class="card" data-card="5">cartes</div>
-            <div class="card" data-card="5">cartes</div>
-            <div class="card" data-card="6">cartes</div>
-            <div class="card" data-card="6">cartes</div>
-        </div>
-         <button class="reset">Reset</button>
-    </div>
-    <script src="script.js"></script>
-
+  <h1>Jeu de Mémoire Animé</h1>
+  <div class="controls">
+    <select id="difficulty">
+      <option value="easy">Facile (12 cartes)</option>
+      <option value="medium" selected>Moyen (16 cartes)</option>
+      <option value="hard">Difficile (20 cartes)</option>
+    </select>
+    <button class="reset">Nouvelle partie</button>
+  </div>
+  <div class="memory-board medium"></div>
+  <script src="script.js"></script>
 </body>
-
 </html>

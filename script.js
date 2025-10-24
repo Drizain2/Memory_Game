@@ -1,103 +1,141 @@
 window.addEventListener('load', () => {
-    let cartesElements = document.querySelectorAll('.card');
-    const content = document.querySelector('.main');
-    const resetBn = document.querySelector('.reset')
-    const timerElement = document.querySelector('.timer');
+    console.log('Page chargée');
+    const board = document.querySelector('.memory-board');
+    if (!board) {
+        console.error('Erreur : .memory-board non trouvé');
+        return;
+    }
+    const difficultySelect = document.querySelector('#difficulty');
+    const resetBtn = document.querySelector('.reset');
+    if (!difficultySelect || !resetBtn) {
+        console.error('Erreur : Éléments de contrôle non trouvés', { difficultySelect, resetBtn });
+        return;
+    }
+    const emojis = ['😎', '🚀', '⚡', '🔥', '🌟', '🦁', '🐉', '🎮', '🛸', '🤖', '🎸', '🏎️', '⚽', '🍕', '🍔', '🌈', '🦄', '🎉', '💥', '🪐'];
     let cards = [];
     let flippedCards = [];
     let lockBoard = false;
-    let timer = 0;
+    let matchesFound = 0;
 
-    cartesElements = shuffle(Array.from(cartesElements));
-    class Card {
-        static id = 0;
-        constructor(image, element) {
-            this.id = Card.id++;
-            this.image = image;
-            this.found = false;
-            this.isFlipped = false;
-            this.element = element;
-        }
-        affiche() {
-            console.log(`La carte a pour id ${this.id} et pour image ${this.image}`);
-        }
-        flip() {
-            if (this.found) return; // Ne pas retourner une carte déjà trouvée
-            this.isFlipped = !this.isFlipped;
-            this.element.classList.toggle('flipped', this.isFlipped);
-            this.element.textContent = this.isFlipped ? this.image : '';
-        }
-        show() {
-            this.element.textContent = this.image;
-        }
-        hide() {
-            this.element.textContent = '';
-        }
-    }
+    console.log('Board:', board);
+    console.log('Difficulty select:', difficultySelect);
+    console.log('Reset button:', resetBtn);
 
-    let emojis = ['😃', '😄', '😁', '😅', '🤣', '😂', '🙂', '🙃', '🫠', '😉', '😊', '😇', '🥰', '😍'];
-    let emojipairs = [...emojis, ...emojis];
-    emojipairs = emojipairs.sort(() => Math.random() - 0.5);
-
-
-    content.append(...cartesElements);
-
-
-    cartesElements.forEach((element, i) => {
-        const emojiIndex = element.dataset.card;
-        const image = emojipairs[emojiIndex];
-        const card = new Card(image, element);
-        cards.push(card);
-        card.hide(); // Masquer l'emoji au départ
-        element.addEventListener("click", () => handleClick(card));
+    initializeGame();
+    difficultySelect.addEventListener('change', () => {
+        console.log('Changement de difficulté:', difficultySelect.value);
+        initializeGame();
+    });
+    resetBtn.addEventListener('click', () => {
+        console.log('Reset cliqué');
+        resetGame();
     });
 
-    function handleClick(card) {
-        if (lockBoard || card.isFlipped || card.found) return;
-        card.flip();
-        card.affiche();
-        flippedCards.push(card);
+    function initializeGame() {
+        console.log('Initialisation du jeu...');
+        const level = difficultySelect.value;
+        const cardCount = level === 'easy' ? 12 : level === 'medium' ? 16 : 20;
+        const maxPairs = cardCount / 2;
+        board.className = `memory-board ${level}`;
+        console.log(`Niveau: ${level}, Cartes: ${cardCount}, Paires: ${maxPairs}`);
+        createBoard(cardCount, maxPairs);
+        initializeCards();
+    }
 
-        if (flippedCards.length === 2) {
-            lockBoard = true;
-            if (flippedCards[0].image === flippedCards[1].image) {
-                flippedCards[0].found = true;
-                flippedCards[1].found = true;
-                flippedCards = [];
-                lockBoard = false;
-                if (cards.every(c => c.found)) {
-                    setTimeout(() => alert('Bravo, toutes les paires sont trouvées !'), 500);
-                }
-            } else {
-                setTimeout(() => {
-                    flippedCards[0].flip();
-                    flippedCards[1].flip();
-                    flippedCards = [];
-                    lockBoard = false;
-                }, 1000);
-            }
+    function createBoard(cardCount, maxPairs) {
+        console.log(`Création de ${cardCount} cartes avec ${maxPairs} paires`);
+        board.innerHTML = '';
+        const emojiPairs = shuffle([...emojis.slice(0, maxPairs), ...emojis.slice(0, maxPairs)]);
+        console.log('Emojis mélangés:', emojiPairs);
+        for (let i = 0; i < cardCount; i++) {
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+            card.dataset.symbol = emojiPairs[i];
+            card.innerHTML = `
+            <div class="card-inner">
+              <div class="card-front"></div>
+              <div class="card-back" aria-label="Symbole ${emojiPairs[i]}">${emojiPairs[i]}</div>
+            </div>
+          `;
+            board.appendChild(card);
+            console.log(`Carte ${i} créée avec symbole: ${emojiPairs[i]}`);
+        }
+        cards = document.querySelectorAll('.memory-card');
+        console.log('Total cartes créées:', cards.length);
+        if (cards.length !== cardCount) {
+            console.error('Erreur : Nombre de cartes incorrect', { expected: cardCount, actual: cards.length });
         }
     }
+
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
-        return array
+        return array;
     }
-    resetBn.addEventListener('click', () => {
-        cards.forEach(card => {
-            card.found = false;
-            card.flip();
-            card.hide();
+
+    function initializeCards() {
+        console.log('Initialisation des cartes...');
+        cards.forEach((card, index) => {
+            console.log(`Carte ${index}: ${card.dataset.symbol}`);
+            card.classList.remove('flipped', 'matched', 'no-match');
+            card.removeEventListener('click', flipCard);
+            card.addEventListener('click', flipCard);
         });
-    })
+        matchesFound = 0;
+        flippedCards = [];
+        lockBoard = false;
+    }
 
-    const timerInterval = setInterval(dure, 1000);
+    function flipCard() {
+        if (lockBoard || this.classList.contains('flipped') || flippedCards.length >= 2) return;
+        console.log('Carte cliquée:', this.dataset.symbol);
+        this.classList.add('flipped');
+        flippedCards.push(this);
+        if (flippedCards.length === 2) {
+            lockBoard = true;
+            checkMatch();
+        }
+    }
 
-    function dure() {
-        timer++;
-        timerElement.textContent = `Temps écouleur : ${Math.floor(timer / 60)} : ${timer % 60} s`;
+    function checkMatch() {
+        const [card1, card2] = flippedCards;
+        console.log('Vérification:', card1.dataset.symbol, card2.dataset.symbol);
+        if (card1.dataset.symbol === card2.dataset.symbol) {
+            matchesFound++;
+            card1.classList.add('matched');
+            card2.classList.add('matched');
+            flippedCards = [];
+            lockBoard = false;
+            if (matchesFound === cards.length / 2) {
+                setTimeout(() => {
+                    console.log('Victoire !');
+                    const victoryMessage = document.createElement('div');
+                    victoryMessage.className = 'victory';
+                    victoryMessage.textContent = 'Bravo, toutes les paires trouvées !';
+                    board.appendChild(victoryMessage);
+                    setTimeout(() => {
+                        console.log('Suppression modale');
+                        victoryMessage.remove();
+                    }, 3000);
+                }, 500);
+            }
+        } else {
+            card1.classList.add('no-match');
+            card2.classList.add('no-match');
+            setTimeout(() => {
+                card1.classList.remove('flipped', 'no-match');
+                card2.classList.remove('flipped', 'no-match');
+                flippedCards = [];
+                lockBoard = false;
+            }, 1000);
+        }
+    }
+
+    function resetGame() {
+        console.log('Reset du jeu...');
+        cards.forEach(card => card.classList.remove('flipped', 'matched', 'no-match'));
+        initializeGame();
     }
 });
-
